@@ -21,14 +21,19 @@ type CreatePatternImageOption struct {
 }
 
 func CreatePatternImage(pattern [][]int, opt *CreatePatternImageOption) *ebiten.Image {
-	canvasWidth := int(float64(len(pattern[0]))*(opt.DotSize+opt.DotInterval) - opt.DotInterval)
-	canvasHeight := int(float64(len(pattern))*(opt.DotSize+opt.DotInterval) - opt.DotInterval)
+	dotSize := opt.DotSize
+	if dotSize == 0 {
+		dotSize = 15
+	}
+
+	canvasWidth := int(float64(len(pattern[0]))*(dotSize+opt.DotInterval) - opt.DotInterval)
+	canvasHeight := int(float64(len(pattern))*(dotSize+opt.DotInterval) - opt.DotInterval)
 	canvas := ebiten.NewImage(canvasWidth, canvasHeight)
 
 	DrawPattern(canvas, pattern, 0, 0, &DrawPatternOption{
 		Color:       opt.Color,
 		ColorMap:    opt.ColorMap,
-		DotSize:     opt.DotSize,
+		DotSize:     dotSize,
 		DotInterval: opt.DotInterval,
 	})
 
