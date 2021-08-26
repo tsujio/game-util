@@ -23,6 +23,7 @@ const (
 
 type DrawPatternOption struct {
 	Color        color.Color
+	ColorMap     map[int]color.Color
 	DotSize      float64
 	DotInterval  float64
 	Rotate       float64
@@ -49,18 +50,27 @@ func DrawPattern(dst *ebiten.Image, pattern [][]int, x, y float64, option *DrawP
 	canvas := drawPatternCanvas.SubImage(image.Rect(0, 0, canvasWidth, canvasHeight)).(*ebiten.Image)
 	canvas.Clear()
 
-	dotImg := emptyImage.SubImage(image.Rect(0, 0, 1, 1)).(*ebiten.Image)
-	dotImg.Fill(opt.Color)
-
 	for i := 0; i < len(pattern); i++ {
 		for j := 0; j < len(pattern[i]); j++ {
-			if pattern[i][j] != 0 {
+			var c color.Color
+			if opt.ColorMap == nil {
+				if pattern[i][j] != 0 {
+					c = opt.Color
+				}
+			} else if clr, exists := opt.ColorMap[pattern[i][j]]; exists {
+				c = clr
+			}
+
+			if c != nil {
 				xij := float64(j) * (opt.DotSize + opt.DotInterval)
 				yij := float64(i) * (opt.DotSize + opt.DotInterval)
 
 				o := &ebiten.DrawImageOptions{}
 				o.GeoM.Scale(opt.DotSize, opt.DotSize)
 				o.GeoM.Translate(xij, yij)
+
+				dotImg := emptyImage.SubImage(image.Rect(0, 0, 1, 1)).(*ebiten.Image)
+				dotImg.Fill(c)
 
 				canvas.DrawImage(dotImg, o)
 			}
