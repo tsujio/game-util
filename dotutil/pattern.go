@@ -50,29 +50,28 @@ func DrawPattern(dst *ebiten.Image, pattern [][]int, x, y float64, option *DrawP
 	canvas := drawPatternCanvas.SubImage(image.Rect(0, 0, canvasWidth, canvasHeight)).(*ebiten.Image)
 	canvas.Clear()
 
-	for i := 0; i < len(pattern); i++ {
-		for j := 0; j < len(pattern[i]); j++ {
-			var c color.Color
-			if opt.ColorMap == nil {
-				if pattern[i][j] != 0 {
-					c = opt.Color
+	var cmap map[int]color.Color
+	if opt.ColorMap != nil {
+		cmap = opt.ColorMap
+	} else {
+		cmap = map[int]color.Color{1: opt.Color}
+	}
+
+	for v, c := range cmap {
+		d := emptyImage.SubImage(image.Rect(0, 0, 1, 1)).(*ebiten.Image)
+		d.Fill(c)
+		for i := 0; i < len(pattern); i++ {
+			for j := 0; j < len(pattern[i]); j++ {
+				if pattern[i][j] == v {
+					xij := float64(j) * (opt.DotSize + opt.DotInterval)
+					yij := float64(i) * (opt.DotSize + opt.DotInterval)
+
+					o := &ebiten.DrawImageOptions{}
+					o.GeoM.Scale(opt.DotSize, opt.DotSize)
+					o.GeoM.Translate(xij, yij)
+
+					canvas.DrawImage(d, o)
 				}
-			} else if clr, exists := opt.ColorMap[pattern[i][j]]; exists {
-				c = clr
-			}
-
-			if c != nil {
-				xij := float64(j) * (opt.DotSize + opt.DotInterval)
-				yij := float64(i) * (opt.DotSize + opt.DotInterval)
-
-				o := &ebiten.DrawImageOptions{}
-				o.GeoM.Scale(opt.DotSize, opt.DotSize)
-				o.GeoM.Translate(xij, yij)
-
-				dotImg := emptyImage.SubImage(image.Rect(0, 0, 1, 1)).(*ebiten.Image)
-				dotImg.Fill(c)
-
-				canvas.DrawImage(dotImg, o)
 			}
 		}
 	}
