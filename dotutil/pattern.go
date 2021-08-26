@@ -3,7 +3,6 @@ package dotutil
 import (
 	"image"
 	"image/color"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -12,6 +11,28 @@ var drawPatternCanvas *ebiten.Image
 
 func init() {
 	drawPatternCanvas = ebiten.NewImage(100, 100)
+}
+
+type CreatePatternImageOption struct {
+	Color       color.Color
+	ColorMap    map[int]color.Color
+	DotSize     float64
+	DotInterval float64
+}
+
+func CreatePatternImage(pattern [][]int, opt *CreatePatternImageOption) *ebiten.Image {
+	canvasWidth := int(float64(len(pattern[0]))*(opt.DotSize+opt.DotInterval) - opt.DotInterval)
+	canvasHeight := int(float64(len(pattern))*(opt.DotSize+opt.DotInterval) - opt.DotInterval)
+	canvas := ebiten.NewImage(canvasWidth, canvasHeight)
+
+	DrawPattern(canvas, pattern, 0, 0, &DrawPatternOption{
+		Color:       opt.Color,
+		ColorMap:    opt.ColorMap,
+		DotSize:     opt.DotSize,
+		DotInterval: opt.DotInterval,
+	})
+
+	return canvas
 }
 
 type PatternPosition int
@@ -76,16 +97,18 @@ func DrawPattern(dst *ebiten.Image, pattern [][]int, x, y float64, option *DrawP
 		}
 	}
 
-	o := &ebiten.DrawImageOptions{}
-	o.GeoM.Rotate(opt.Rotate)
-	o.GeoM.Translate(x, y)
-
+	var pos DrawImagePosition
 	switch opt.BasePosition {
+	case PatternPositionTopLeft:
+		pos = DrawImagePositionTopLeft
 	case PatternPositionCenter:
-		r := math.Sqrt(math.Pow(float64(canvasWidth), 2)+math.Pow(float64(canvasHeight), 2)) / 2
-		rad := math.Atan2(float64(canvasHeight), float64(canvasWidth))
-		o.GeoM.Translate(-r*math.Cos(opt.Rotate+rad), -r*math.Sin(opt.Rotate+rad))
+		pos = DrawImagePositionCenter
+	default:
+		panic("Invalid position")
 	}
 
-	dst.DrawImage(canvas, o)
+	DrawImage(dst, canvas, x, y, &DrawImageOption{
+		Rotate:       opt.Rotate,
+		BasePosition: pos,
+	})
 }
