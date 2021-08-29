@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type LineDotPosition int
@@ -42,10 +43,6 @@ func DrawLine(dst *ebiten.Image, srcX, srcY, destX, destY float64, option *DrawL
 	}
 
 	lineLength := math.Sqrt(math.Pow(srcX-destX, 2) + math.Pow(srcY-destY, 2))
-	angle := math.Atan2(destY-srcY, destX-srcX)
-
-	dotImg := emptyImage.SubImage(image.Rect(0, 0, 1, 1)).(*ebiten.Image)
-	dotImg.Fill(opt.Color)
 
 	if w, h := drawLineCanvas.Size(); w < int(lineLength) || h < int(opt.DotSize) {
 		drawLineCanvas = ebiten.NewImage(int(lineLength)*2, int(opt.DotSize)*2)
@@ -55,10 +52,7 @@ func DrawLine(dst *ebiten.Image, srcX, srcY, destX, destY float64, option *DrawL
 
 	var x float64 = 0
 	for x <= lineLength {
-		o := &ebiten.DrawImageOptions{}
-		o.GeoM.Scale(opt.DotSize, opt.DotSize)
-		o.GeoM.Translate(x, 0)
-		canvas.DrawImage(dotImg, o)
+		ebitenutil.DrawRect(canvas, x, 0, opt.DotSize, opt.DotSize, opt.Color)
 		x += opt.DotSize + opt.Interval
 	}
 
@@ -69,7 +63,7 @@ func DrawLine(dst *ebiten.Image, srcX, srcY, destX, destY float64, option *DrawL
 	case LineDotPositionCenter:
 		o.GeoM.Translate(0, -opt.DotSize/2)
 	}
-	if angle != 0 {
+	if angle := math.Atan2(destY-srcY, destX-srcX); angle != 0 {
 		o.GeoM.Rotate(angle)
 	}
 	o.GeoM.Translate(srcX, srcY)

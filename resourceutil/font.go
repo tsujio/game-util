@@ -84,3 +84,11 @@ func LoadFont(repository fs.FS, fontName string, option *LoadFontOption) (largeF
 
 	return
 }
+
+func ForceLoadFont(repository fs.FS, fontName string, option *LoadFontOption) (largeFont, mediumFont, smallFont *Font) {
+	l, m, s, err := LoadFont(repository, fontName, option)
+	if err != nil {
+		panic(err)
+	}
+	return l, m, s
+}
