@@ -1,4 +1,4 @@
-package dotutil
+package drawutil
 
 import "github.com/hajimehoshi/ebiten/v2"
 
