@@ -6,41 +6,53 @@ import (
 )
 
 type TouchContext struct {
-	isTouchIDsJustStored bool
-	touchIDs             []ebiten.TouchID
+	isTouchJustPressed        bool
+	isTouchJustReleased       bool
+	isMouseButtonJustPressed  bool
+	isMouseButtonJustReleased bool
+	touchIDs                  []ebiten.TouchID
+	mainTouchID               *ebiten.TouchID
 }
 
 func CreateTouchContext() *TouchContext {
-	return &TouchContext{}
+	return &TouchContext{
+		touchIDs: []ebiten.TouchID{},
+	}
 }
 
 func (c *TouchContext) Update() {
-	if touchIDs := inpututil.JustPressedTouchIDs(); len(touchIDs) > 0 {
-		c.touchIDs = touchIDs
-		c.isTouchIDsJustStored = true
+	c.touchIDs = inpututil.AppendJustPressedTouchIDs(c.touchIDs[:0])
+	if c.mainTouchID == nil && len(c.touchIDs) > 0 {
+		c.mainTouchID = &c.touchIDs[0]
+		c.isTouchJustPressed = true
 	} else {
-		c.isTouchIDsJustStored = false
+		c.isTouchJustPressed = false
 	}
+
+	if c.mainTouchID != nil && inpututil.IsTouchJustReleased(*c.mainTouchID) {
+		c.mainTouchID = nil
+		c.isTouchJustReleased = true
+	} else {
+		c.isTouchJustReleased = false
+	}
+
+	c.isMouseButtonJustPressed = inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+
+	c.isMouseButtonJustReleased = inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft)
 }
 
 func (c *TouchContext) IsJustTouched() bool {
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		return true
-	}
-	if c.isTouchIDsJustStored {
-		return true
-	}
-	return false
+	return c.isTouchJustPressed || c.isMouseButtonJustPressed
 }
 
 func (c *TouchContext) IsJustReleased() bool {
-	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
-		return true
+	return c.isTouchJustReleased || c.isMouseButtonJustReleased
+}
+
+func (c *TouchContext) GetTouchPosition() (int, int) {
+	if c.mainTouchID != nil {
+		return ebiten.TouchPosition(*c.mainTouchID)
 	}
-	for _, id := range c.touchIDs {
-		if inpututil.IsTouchJustReleased(id) {
-			return true
-		}
-	}
-	return false
+
+	return ebiten.CursorPosition()
 }
