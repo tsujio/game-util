@@ -13,14 +13,14 @@ func init() {
 	drawPatternCanvas = ebiten.NewImage(100, 100)
 }
 
-type CreatePatternImageOption struct {
+type CreatePatternImageOption[T int | rune] struct {
 	Color       color.Color
-	ColorMap    map[int]color.Color
+	ColorMap    map[T]color.Color
 	DotSize     float64
 	DotInterval float64
 }
 
-func CreatePatternImage(pattern [][]int, opt *CreatePatternImageOption) *ebiten.Image {
+func CreatePatternImage[T int | rune](pattern [][]T, opt *CreatePatternImageOption[T]) *ebiten.Image {
 	dotSize := opt.DotSize
 	if dotSize == 0 {
 		dotSize = 15
@@ -30,7 +30,7 @@ func CreatePatternImage(pattern [][]int, opt *CreatePatternImageOption) *ebiten.
 	canvasHeight := int(float64(len(pattern))*(dotSize+opt.DotInterval) - opt.DotInterval)
 	canvas := ebiten.NewImage(canvasWidth, canvasHeight)
 
-	DrawPattern(canvas, pattern, 0, 0, &DrawPatternOption{
+	DrawPattern(canvas, pattern, 0, 0, &DrawPatternOption[T]{
 		Color:       opt.Color,
 		ColorMap:    opt.ColorMap,
 		DotSize:     dotSize,
@@ -40,6 +40,14 @@ func CreatePatternImage(pattern [][]int, opt *CreatePatternImageOption) *ebiten.
 	return canvas
 }
 
+func CreatePatternImageArray[T int | rune](patterns [][][]T, opt *CreatePatternImageOption[T]) []*ebiten.Image {
+	var images []*ebiten.Image
+	for _, pattern := range patterns {
+		images = append(images, CreatePatternImage(pattern, opt))
+	}
+	return images
+}
+
 type PatternPosition int
 
 const (
@@ -47,17 +55,17 @@ const (
 	PatternPositionCenter
 )
 
-type DrawPatternOption struct {
+type DrawPatternOption[T int | rune] struct {
 	Color        color.Color
-	ColorMap     map[int]color.Color
+	ColorMap     map[T]color.Color
 	DotSize      float64
 	DotInterval  float64
 	Rotate       float64
 	BasePosition PatternPosition
 }
 
-func DrawPattern(dst *ebiten.Image, pattern [][]int, x, y float64, option *DrawPatternOption) {
-	var opt DrawPatternOption
+func DrawPattern[T int | rune](dst *ebiten.Image, pattern [][]T, x, y float64, option *DrawPatternOption[T]) {
+	var opt DrawPatternOption[T]
 	if option != nil {
 		opt = *option
 	}
@@ -76,11 +84,11 @@ func DrawPattern(dst *ebiten.Image, pattern [][]int, x, y float64, option *DrawP
 	canvas := drawPatternCanvas.SubImage(image.Rect(0, 0, canvasWidth, canvasHeight)).(*ebiten.Image)
 	canvas.Clear()
 
-	var cmap map[int]color.Color
+	var cmap map[T]color.Color
 	if opt.ColorMap != nil {
 		cmap = opt.ColorMap
 	} else {
-		cmap = map[int]color.Color{1: opt.Color}
+		cmap = map[T]color.Color{1: opt.Color}
 	}
 
 	for v, c := range cmap {

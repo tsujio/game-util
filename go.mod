@@ -1,6 +1,6 @@
 module github.com/tsujio/game-util
 
-go 1.16
+go 1.19
 
 require (
 	github.com/ebitengine/purego v0.1.1 // indirect
