@@ -12,6 +12,7 @@ type TouchContext struct {
 	isMouseButtonJustReleased bool
 	touchIDs                  []ebiten.TouchID
 	mainTouchID               *ebiten.TouchID
+	touchPositionCache        []int
 }
 
 func CreateTouchContext() *TouchContext {
@@ -39,6 +40,8 @@ func (c *TouchContext) Update() {
 	c.isMouseButtonJustPressed = inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
 
 	c.isMouseButtonJustReleased = inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft)
+
+	c.touchPositionCache = nil
 }
 
 func (c *TouchContext) IsJustTouched() bool {
@@ -50,13 +53,22 @@ func (c *TouchContext) IsJustReleased() bool {
 }
 
 func (c *TouchContext) GetTouchPosition() (int, int) {
-	if c.mainTouchID != nil {
-		if c.isTouchJustReleased {
-			return inpututil.TouchPositionInPreviousTick(*c.mainTouchID)
-		} else {
-			return ebiten.TouchPosition(*c.mainTouchID)
-		}
+	if c.touchPositionCache != nil {
+		return c.touchPositionCache[0], c.touchPositionCache[1]
 	}
 
-	return ebiten.CursorPosition()
+	var x, y int
+	if c.mainTouchID != nil {
+		if c.isTouchJustReleased {
+			x, y = inpututil.TouchPositionInPreviousTick(*c.mainTouchID)
+		} else {
+			x, y = ebiten.TouchPosition(*c.mainTouchID)
+		}
+	} else {
+		x, y = ebiten.CursorPosition()
+	}
+
+	c.touchPositionCache = []int{x, y}
+
+	return x, y
 }
