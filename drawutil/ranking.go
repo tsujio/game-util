@@ -20,9 +20,10 @@ type DrawRankingOption struct {
 	BackgroundColor, FontColor color.Color
 	TitleFont, BodyFont        *resourceutil.Font
 	ScreenWidth, ScreenHeight  int
+	PlayerID                   string
 }
 
-func DrawRanking(dst *ebiten.Image, ranking []client.GameScore, playerID string, opt *DrawRankingOption) {
+func DrawRanking(dst *ebiten.Image, ranking []client.GameScore, opt *DrawRankingOption) {
 	if opt == nil {
 		opt = &DrawRankingOption{}
 	}
@@ -62,7 +63,7 @@ func DrawRanking(dst *ebiten.Image, ranking []client.GameScore, playerID string,
 
 	rankIn := false
 	for _, r := range ranking {
-		if r.PlayerID == playerID {
+		if opt.PlayerID != "" && r.PlayerID == opt.PlayerID {
 			rankIn = true
 		}
 	}
@@ -89,7 +90,7 @@ func DrawRanking(dst *ebiten.Image, ranking []client.GameScore, playerID string,
 		}
 		t := fmt.Sprintf("%d. %5d %s", rank, r.Score, r.Timestamp.Local().Format("2006.01.02"))
 		if rankIn {
-			if r.PlayerID == playerID {
+			if r.PlayerID == opt.PlayerID {
 				t += " YOU!"
 			} else {
 				t += "     "
