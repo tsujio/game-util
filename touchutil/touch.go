@@ -51,7 +51,11 @@ func (c *TouchContext) IsJustReleased() bool {
 
 func (c *TouchContext) GetTouchPosition() (int, int) {
 	if c.mainTouchID != nil {
-		return ebiten.TouchPosition(*c.mainTouchID)
+		if c.isTouchJustReleased {
+			return inpututil.TouchPositionInPreviousTick(*c.mainTouchID)
+		} else {
+			return ebiten.TouchPosition(*c.mainTouchID)
+		}
 	}
 
 	return ebiten.CursorPosition()
