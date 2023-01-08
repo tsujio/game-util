@@ -59,7 +59,9 @@ func DrawRanking(dst *ebiten.Image, ranking []client.GameScore, opt *DrawRanking
 		opt.FontColor,
 	)
 
-	ranking = ranking[:5]
+	if len(ranking) > 5 {
+		ranking = ranking[:5]
+	}
 
 	rankIn := false
 	for _, r := range ranking {
