@@ -17,15 +17,15 @@ const (
 
 type Game struct {
 	touchContext       *touchutil.TouchContext
-	touchStartPosition []int
+	touchStartPosition *touchutil.TouchPosition
 }
 
 func (g *Game) Update() error {
 	g.touchContext.Update()
 
 	if g.touchContext.IsJustTouched() {
-		x, y := g.touchContext.GetTouchPosition()
-		g.touchStartPosition = []int{x, y}
+		pos := g.touchContext.GetTouchPosition()
+		g.touchStartPosition = &pos
 	}
 
 	if g.touchContext.IsJustReleased() {
@@ -39,10 +39,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.Black)
 
 	if g.touchStartPosition != nil {
-		x, y := g.touchContext.GetTouchPosition()
+		pos := g.touchContext.GetTouchPosition()
 		ebitenutil.DrawLine(screen,
-			float64(g.touchStartPosition[0]), float64(g.touchStartPosition[1]),
-			float64(x), float64(y),
+			float64(g.touchStartPosition.X), float64(g.touchStartPosition.Y),
+			float64(pos.X), float64(pos.Y),
 			color.White)
 	}
 

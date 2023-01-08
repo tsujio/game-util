@@ -5,6 +5,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+type TouchPosition struct {
+	X, Y int
+}
+
 type TouchContext struct {
 	isTouchJustPressed        bool
 	isTouchJustReleased       bool
@@ -13,7 +17,7 @@ type TouchContext struct {
 	isBeingTouched            bool
 	touchIDs                  []ebiten.TouchID
 	mainTouchID               *ebiten.TouchID
-	touchPositionCache        []int
+	touchPosition             TouchPosition
 }
 
 func CreateTouchContext() *TouchContext {
@@ -32,7 +36,6 @@ func (c *TouchContext) Update() {
 	}
 
 	if c.mainTouchID != nil && inpututil.IsTouchJustReleased(*c.mainTouchID) {
-		c.mainTouchID = nil
 		c.isTouchJustReleased = true
 	} else {
 		c.isTouchJustReleased = false
@@ -42,13 +45,35 @@ func (c *TouchContext) Update() {
 
 	c.isMouseButtonJustReleased = inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft)
 
-	c.touchPositionCache = nil
-
 	if c.IsJustTouched() {
 		c.isBeingTouched = true
 	}
 	if c.IsJustReleased() {
 		c.isBeingTouched = false
+	}
+
+	if c.isBeingTouched || c.IsJustReleased() {
+		var x, y int
+		if c.mainTouchID != nil {
+			if c.isTouchJustReleased {
+				x, y = inpututil.TouchPositionInPreviousTick(*c.mainTouchID)
+			} else {
+				x, y = ebiten.TouchPosition(*c.mainTouchID)
+			}
+		} else {
+			x, y = ebiten.CursorPosition()
+		}
+
+		c.touchPosition = TouchPosition{
+			X: x,
+			Y: y,
+		}
+	} else {
+		c.touchPosition = TouchPosition{}
+	}
+
+	if c.isTouchJustReleased {
+		c.mainTouchID = nil
 	}
 }
 
@@ -64,23 +89,6 @@ func (c *TouchContext) IsBeingTouched() bool {
 	return c.isBeingTouched
 }
 
-func (c *TouchContext) GetTouchPosition() (int, int) {
-	if c.touchPositionCache != nil {
-		return c.touchPositionCache[0], c.touchPositionCache[1]
-	}
-
-	var x, y int
-	if c.mainTouchID != nil {
-		if c.isTouchJustReleased {
-			x, y = inpututil.TouchPositionInPreviousTick(*c.mainTouchID)
-		} else {
-			x, y = ebiten.TouchPosition(*c.mainTouchID)
-		}
-	} else {
-		x, y = ebiten.CursorPosition()
-	}
-
-	c.touchPositionCache = []int{x, y}
-
-	return x, y
+func (c *TouchContext) GetTouchPosition() TouchPosition {
+	return c.touchPosition
 }
