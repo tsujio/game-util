@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.4.15
-	github.com/tsujio/game-logging-server/client v0.0.0-20230108051530-a7e4a1b23b63
+	github.com/tsujio/game-logging-server/client v0.0.0-20230209124752-0a9118f79ee0
 	golang.org/x/image v0.2.0
 )
 
