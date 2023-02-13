@@ -88,7 +88,15 @@ func DrawPattern[T int | rune](dst *ebiten.Image, pattern [][]T, x, y float64, o
 	if opt.ColorMap != nil {
 		cmap = opt.ColorMap
 	} else {
-		cmap = map[T]color.Color{1: opt.Color}
+		cmap = map[T]color.Color{}
+		var zero T
+		for i := range pattern {
+			for j := range pattern[i] {
+				if pattern[i][j] != zero {
+					cmap[pattern[i][j]] = opt.Color
+				}
+			}
+		}
 	}
 
 	for v, c := range cmap {
