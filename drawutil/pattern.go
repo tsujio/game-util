@@ -124,18 +124,17 @@ func DrawPattern[T int | rune](dst *ebiten.Image, pattern [][]T, x, y float64, o
 		}
 	}
 
-	var pos DrawImagePosition
 	switch opt.BasePosition {
 	case PatternPositionTopLeft:
-		pos = DrawImagePositionTopLeft
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Rotate(opt.Rotate)
+		opts.GeoM.Translate(x, y)
+		dst.DrawImage(canvas, opts)
 	case PatternPositionCenter:
-		pos = DrawImagePositionCenter
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Rotate(opt.Rotate)
+		DrawImageAt(dst, canvas, x, y, opts)
 	default:
 		panic("Invalid position")
 	}
-
-	DrawImage(dst, canvas, x, y, &DrawImageOption{
-		Rotate:       opt.Rotate,
-		BasePosition: pos,
-	})
 }
