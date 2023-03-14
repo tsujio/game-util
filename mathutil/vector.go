@@ -26,6 +26,10 @@ func (v *Vector2D) Norm() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
 
+func (v *Vector2D) Normalize() *Vector2D {
+	return v.Div(v.Norm())
+}
+
 func (v *Vector2D) InnerProd(w *Vector2D) float64 {
 	return v.X*w.X + v.Y*w.Y
 }
