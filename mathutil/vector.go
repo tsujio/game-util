@@ -6,6 +6,10 @@ type Vector2D struct {
 	X, Y float64
 }
 
+func NewVector2D(x, y float64) *Vector2D {
+	return &Vector2D{X: x, Y: y}
+}
+
 func (v *Vector2D) Add(w *Vector2D) *Vector2D {
 	return &Vector2D{X: v.X + w.X, Y: v.Y + w.Y}
 }
@@ -44,4 +48,8 @@ func (v *Vector2D) Rotate(theta float64) *Vector2D {
 
 type Vector3D struct {
 	X, Y, Z float64
+}
+
+func NewVector3D(x, y, z float64) *Vector3D {
+	return &Vector3D{X: x, Y: y, Z: z}
 }
