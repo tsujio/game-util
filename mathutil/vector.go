@@ -30,19 +30,23 @@ func (v *Vector2D) Div(a float64) *Vector2D {
 	return &Vector2D{X: v.X / a, Y: v.Y / a}
 }
 
+func (v *Vector2D) NormSq() float64 {
+	return v.X*v.X + v.Y*v.Y
+}
+
 func (v *Vector2D) Norm() float64 {
-	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+	return math.Sqrt(v.NormSq())
 }
 
 func (v *Vector2D) Normalize() *Vector2D {
 	return v.Div(v.Norm())
 }
 
-func (v *Vector2D) InnerProd(w *Vector2D) float64 {
+func (v *Vector2D) Dot(w *Vector2D) float64 {
 	return v.X*w.X + v.Y*w.Y
 }
 
-func (v *Vector2D) OuterProd(w *Vector2D) *Vector3D {
+func (v *Vector2D) Cross(w *Vector2D) *Vector3D {
 	return &Vector3D{X: 0, Y: 0, Z: v.X*w.Y - v.Y*w.X}
 }
 
