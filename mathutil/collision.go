@@ -1,6 +1,6 @@
 package mathutil
 
-const epsilon = -1e-6
+const epsilon = 1e-6
 
 func PointLineDistance(p, p1, v1 *Vector2D) (d float64, h *Vector2D, t float64) {
 	t = 0.0
