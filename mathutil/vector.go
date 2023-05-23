@@ -54,6 +54,10 @@ func (v *Vector2D) Rotate(theta float64) *Vector2D {
 	return &Vector2D{X: math.Cos(theta)*v.X - math.Sin(theta)*v.Y, Y: math.Sin(theta)*v.X + math.Cos(theta)*v.Y}
 }
 
+func (v *Vector2D) Unpack() (float64, float64) {
+	return v.X, v.Y
+}
+
 type Vector3D struct {
 	X, Y, Z float64
 }
@@ -64,4 +68,8 @@ func NewVector3D(x, y, z float64) *Vector3D {
 
 func (v *Vector3D) Clone() *Vector3D {
 	return &Vector3D{X: v.X, Y: v.Y, Z: v.Z}
+}
+
+func (v *Vector3D) Unpack() (float64, float64, float64) {
+	return v.X, v.Y, v.Z
 }
