@@ -70,6 +70,42 @@ func (v *Vector3D) Clone() *Vector3D {
 	return &Vector3D{X: v.X, Y: v.Y, Z: v.Z}
 }
 
+func (v *Vector3D) Add(w *Vector3D) *Vector3D {
+	return &Vector3D{X: v.X + w.X, Y: v.Y + w.Y, Z: v.Z + w.Z}
+}
+
+func (v *Vector3D) Sub(w *Vector3D) *Vector3D {
+	return &Vector3D{X: v.X - w.X, Y: v.Y - w.Y, Z: v.Z - w.Z}
+}
+
+func (v *Vector3D) Mul(a float64) *Vector3D {
+	return &Vector3D{X: v.X * a, Y: v.Y * a, Z: v.Z * a}
+}
+
+func (v *Vector3D) Div(a float64) *Vector3D {
+	return &Vector3D{X: v.X / a, Y: v.Y / a, Z: v.Z / a}
+}
+
+func (v *Vector3D) NormSq() float64 {
+	return v.X*v.X + v.Y*v.Y + v.Z*v.Z
+}
+
+func (v *Vector3D) Norm() float64 {
+	return math.Sqrt(v.NormSq())
+}
+
+func (v *Vector3D) Normalize() *Vector3D {
+	return v.Div(v.Norm())
+}
+
+func (v *Vector3D) Dot(w *Vector3D) float64 {
+	return v.X*w.X + v.Y*w.Y + v.Z*w.Z
+}
+
+func (v *Vector3D) Cross(w *Vector3D) *Vector3D {
+	return &Vector3D{X: v.Y*w.Z - v.Z*w.Y, Y: v.Z*w.X - v.X*w.Z, Z: v.X*w.Y - v.Y*w.X}
+}
+
 func (v *Vector3D) Unpack() (float64, float64, float64) {
 	return v.X, v.Y, v.Z
 }
