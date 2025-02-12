@@ -1,5 +1,9 @@
 package mathutil
 
+import (
+	"math"
+)
+
 func ConvertCoordinateWorldToScreen(pos *Vector3D, cameraY float64, screenZ float64, screenWidth, screenHeight int) *Vector2D {
 	x := pos.X * screenZ / pos.Z
 	y := (pos.Y - cameraY) * screenZ / pos.Z
